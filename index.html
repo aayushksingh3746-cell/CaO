@@ -1,402 +1,1122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calcium Oxide & Limewater Interactive Lab</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realistic Chemistry Lab: Quicklime & Limewater Experiment</title>
   <style>
+    :root {
+      --glass-border: rgba(255, 255, 255, 0.45);
+      --glass-highlight: rgba(255, 255, 255, 0.25);
+      --bench-top: #1e242b;
+      --bench-edge: #0f1318;
+      --accent: #38bdf8;
+    }
+
     * {
       box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      background: #0f172a;
-      color: #f8fafc;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: #090d16;
+      color: #f1f5f9;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 20px;
     }
-    h1 {
-      color: #38bdf8;
+
+    /* Header */
+    .lab-header {
       text-align: center;
-      margin-bottom: 5px;
-    }
-    .subtitle {
-      color: #94a3b8;
-      margin-bottom: 25px;
-      text-align: center;
-    }
-    .lab-container {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 30px;
-      max-width: 1000px;
+      margin-bottom: 18px;
+      max-width: 1150px;
       width: 100%;
-      background: #1e293b;
-      padding: 25px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    }
-    /* Visual Stage */
-    .stage {
-      flex: 1;
-      min-width: 320px;
-      height: 420px;
-      background: #0f172a;
-      border-radius: 12px;
-      position: relative;
       display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      padding-bottom: 40px;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a);
+      padding: 14px 28px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+    }
+
+    .lab-header h1 {
+      font-size: 1.4rem;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      background: #0284c7;
+      color: #fff;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 700;
+    }
+
+    /* Main Workspace */
+    .workspace {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 24px;
+      max-width: 1150px;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ================= REALISTIC LAB STAGE ================= */
+    .lab-viewport {
+      height: 540px;
+      border-radius: 16px;
+      position: relative;
       overflow: hidden;
       border: 2px solid #334155;
+      box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.85), 0 15px 35px rgba(0,0,0,0.6);
+      /* Realistic Lab Tiled Wall Background */
+      background-color: #131c2e;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 50% 35%, rgba(56, 189, 248, 0.12), transparent 70%);
+      background-size: 40px 40px, 40px 40px, 100% 100%;
     }
-    /* Beaker */
-    .beaker {
-      width: 180px;
-      height: 220px;
-      border: 5px solid #cbd5e1;
-      border-top: none;
-      border-radius: 0 0 20px 20px;
+
+    /* Background Lab Shelf & Reagent Bottles (Blurred depth of field) */
+    .lab-shelf {
+      position: absolute;
+      top: 75px;
+      left: 30px;
+      width: 220px;
+      height: 10px;
+      background: linear-gradient(180deg, #334155, #0f172a);
+      border-radius: 4px;
+      box-shadow: 0 8px 15px rgba(0,0,0,0.6);
+      filter: blur(1px);
+      opacity: 0.55;
+    }
+
+    .reagent-bottle {
+      position: absolute;
+      bottom: 10px;
+      border: 1.5px solid rgba(255,255,255,0.4);
+      border-radius: 6px 6px 3px 3px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.15), rgba(255,255,255,0.02));
+    }
+    .b1 { left: 20px; width: 36px; height: 60px; background-color: rgba(180, 83, 9, 0.45); }
+    .b2 { left: 70px; width: 42px; height: 72px; background-color: rgba(56, 189, 248, 0.25); }
+    .b3 { left: 125px; width: 32px; height: 50px; background-color: rgba(255, 255, 255, 0.3); }
+
+    /* Granite Laboratory Benchtop */
+    .bench {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 110px;
+      background: 
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,0.08), transparent 60%),
+        linear-gradient(180deg, #27303f 0%, #171d26 30%, #0d1117 100%);
+      border-top: 3px solid #475569;
+      box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
+      z-index: 2;
+    }
+
+    /* Thermal Reflection on Benchtop */
+    .bench-glow {
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      height: 55px;
+      background: radial-gradient(ellipse, rgba(239, 68, 68, 0) 0%, transparent 70%);
+      transition: background 1.2s ease;
+      pointer-events: none;
+    }
+    .bench-glow.hot {
+      background: radial-gradient(ellipse, rgba(239, 68, 68, 0.55) 0%, rgba(249, 115, 22, 0.2) 50%, transparent 75%);
+    }
+
+    /* Retort Stand (Metallic Lab Stand) */
+    .retort-base {
+      position: absolute;
+      bottom: 65px;
+      right: 75px;
+      width: 140px;
+      height: 16px;
+      background: linear-gradient(90deg, #334155, #64748b, #1e293b);
+      border-radius: 4px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.8);
+      z-index: 3;
+    }
+    .retort-rod {
+      position: absolute;
+      bottom: 80px;
+      right: 110px;
+      width: 10px;
+      height: 410px;
+      background: linear-gradient(90deg, #475569, #cbd5e1, #334155);
+      z-index: 3;
+      border-radius: 4px 4px 0 0;
+    }
+    .retort-clamp {
+      position: absolute;
+      top: 125px;
+      right: 105px;
+      width: 115px;
+      height: 12px;
+      background: linear-gradient(180deg, #94a3b8, #475569);
+      border-radius: 4px;
+      z-index: 7;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    /* Digital LCD Temperature Monitor mounted on Stand */
+    .digital-meter {
+      position: absolute;
+      top: 55px;
+      right: 35px;
+      width: 145px;
+      background: #0f172a;
+      border: 2px solid #475569;
+      border-radius: 10px;
+      padding: 8px 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+      z-index: 10;
+    }
+    .meter-label {
+      font-size: 0.65rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .meter-screen {
+      font-family: 'Courier New', monospace;
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #38bdf8;
+      text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+      margin-top: 2px;
+      transition: color 0.5s ease;
+    }
+    .meter-screen.hot {
+      color: #ef4444;
+      text-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    }
+
+    /* Glass Thermometer Probe */
+    .thermometer-glass {
+      position: absolute;
+      bottom: 105px;
+      right: 205px;
+      width: 14px;
+      height: 320px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.1), rgba(255,255,255,0.4));
+      border: 1.5px solid rgba(255,255,255,0.55);
+      border-radius: 10px;
+      z-index: 6;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 4px;
+      box-shadow: inset 0 0 4px rgba(255,255,255,0.5);
+    }
+    /* Thermometer Graduations */
+    .thermometer-glass::after {
+      content: '';
+      position: absolute;
+      top: 20px;
+      bottom: 25px;
+      left: 2px;
+      width: 5px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.6) 0px,
+        rgba(255,255,255,0.6) 1px,
+        transparent 1px,
+        transparent 8px
+      );
+    }
+    .thermometer-bulb {
+      position: absolute;
+      bottom: -10px;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle at 30% 30%, #f87171, #dc2626, #7f1d1d);
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+    }
+    .mercury-column {
+      width: 5px;
+      height: 22%;
+      background: linear-gradient(90deg, #ef4444, #f87171);
+      border-radius: 4px 4px 0 0;
+      transition: height 1.8s cubic-bezier(0.22, 1, 0.36, 1);
+      box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+    }
+
+    /* ================= 3D BOROSILICATE GLASS BEAKER ================= */
+    .beaker-wrapper {
+      position: absolute;
+      bottom: 72px;
+      left: 50%;
+      transform: translateX(-55%);
+      width: 220px;
+      height: 270px;
+      z-index: 5;
+    }
+
+    /* Top Rim of Beaker */
+    .beaker-rim {
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      width: 232px;
+      height: 14px;
+      border: 3px solid rgba(255, 255, 255, 0.65);
+      border-radius: 50%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05), rgba(255,255,255,0.25));
+      z-index: 8;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    }
+
+    .beaker-body {
+      width: 100%;
+      height: 100%;
       position: relative;
-      background: rgba(255, 255, 255, 0.03);
-      transition: box-shadow 1s ease;
+      border-left: 3.5px solid rgba(255, 255, 255, 0.55);
+      border-right: 3.5px solid rgba(255, 255, 255, 0.55);
+      border-bottom: 8px solid rgba(255, 255, 255, 0.65);
+      border-radius: 0 0 26px 26px;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.04) 15%,
+        rgba(255, 255, 255, 0.01) 50%,
+        rgba(255, 255, 255, 0.05) 85%,
+        rgba(255, 255, 255, 0.22) 100%
+      );
+      box-shadow: 
+        inset 12px 0 20px rgba(255, 255, 255, 0.12),
+        inset -12px 0 20px rgba(255, 255, 255, 0.15),
+        inset 0 -12px 25px rgba(255, 255, 255, 0.2),
+        0 18px 30px rgba(0, 0, 0, 0.75);
+      overflow: hidden;
+      transition: box-shadow 1s ease, border-color 1s ease;
     }
-    .beaker.hot {
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.7);
-      border-color: #fca5a5;
+
+    .beaker-body.exothermic {
+      border-color: rgba(252, 165, 165, 0.8);
+      box-shadow: 
+        inset 0 -20px 40px rgba(239, 68, 68, 0.35),
+        0 0 55px rgba(239, 68, 68, 0.55),
+        0 18px 30px rgba(0, 0, 0, 0.75);
     }
-    /* Water / Liquid */
-    .liquid {
+
+    /* Specular Glass Reflection Streak */
+    .glass-streak {
+      position: absolute;
+      top: 15px;
+      left: 16px;
+      width: 14px;
+      height: 225px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.08));
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 9;
+      filter: blur(0.5px);
+    }
+
+    /* Beaker Volume Markings (mL) */
+    .graduations {
+      position: absolute;
+      right: 22px;
+      bottom: 25px;
+      height: 200px;
+      width: 45px;
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .grad-line {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.75);
+      font-family: monospace;
+    }
+    .grad-line::after {
+      content: '';
+      width: 14px;
+      height: 1.5px;
+      background: rgba(255, 255, 255, 0.75);
+    }
+    .brand-stamp {
+      position: absolute;
+      top: 32px;
+      left: 42px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: rgba(255, 255, 255, 0.55);
+      letter-spacing: 1px;
+      z-index: 9;
+      pointer-events: none;
+    }
+
+    /* ================= LIQUID & MENISCUS ================= */
+    .liquid-container {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 0%;
-      background: rgba(56, 189, 248, 0.35);
-      border-radius: 0 0 15px 15px;
-      transition: height 1.2s ease, background 1.5s ease;
+      transition: height 1.6s cubic-bezier(0.22, 1, 0.36, 1), background 1.8s ease, box-shadow 1.8s ease;
+      background: linear-gradient(180deg, rgba(56, 189, 248, 0.22) 0%, rgba(14, 165, 233, 0.38) 100%);
+      z-index: 4;
     }
-    .liquid.milky {
-      background: rgba(248, 250, 252, 0.92);
-      box-shadow: inset 0 0 20px #ffffff;
-    }
-    /* CaO Lumps */
-    .lumps-container {
+
+    /* Liquid Surface Meniscus */
+    .meniscus {
       position: absolute;
-      bottom: 5px;
-      left: 25px;
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-      opacity: 0;
-      transition: opacity 0.5s ease, transform 1s ease;
-    }
-    .lump {
-      width: 35px;
-      height: 28px;
-      background: #e2e8f0;
-      border-radius: 40% 60% 30% 70%;
-      border: 2px solid #94a3b8;
-      transition: all 1.2s ease;
-    }
-    .lump.slaked {
-      height: 10px;
-      width: 42px;
-      border-radius: 50%;
-      background: #ffffff;
-      border-color: #cbd5e1;
-    }
-    /* Thermometer */
-    .thermometer {
-      position: absolute;
-      right: 45px;
-      bottom: 40px;
-      width: 16px;
-      height: 250px;
-      background: #334155;
-      border-radius: 10px;
-      border: 2px solid #94a3b8;
-      display: flex;
-      align-items: flex-end;
-      padding: 3px;
-    }
-    .mercury {
+      top: -7px;
+      left: 0;
       width: 100%;
-      height: 20%;
-      background: #38bdf8;
-      border-radius: 6px;
-      transition: height 1.5s ease, background 1s ease;
+      height: 14px;
+      border-radius: 50%;
+      background: rgba(186, 230, 253, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      transition: background 1.8s ease;
     }
-    .temp-label {
-      position: absolute;
-      right: 25px;
-      top: 100px;
-      background: #1e293b;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 14px;
-      border: 1px solid #475569;
+
+    /* Slaked Lime Cloudy Suspension State */
+    .liquid-container.slaked-suspension {
+      background: linear-gradient(
+        180deg,
+        rgba(226, 232, 240, 0.45) 0%,
+        rgba(241, 245, 249, 0.75) 70%,
+        rgba(255, 255, 255, 0.95) 100%
+      );
     }
-    /* Straw / CO2 Tube */
-    .straw {
+
+    /* Clear Limewater State */
+    .liquid-container.clear-limewater {
+      background: linear-gradient(
+        180deg,
+        rgba(186, 230, 253, 0.16) 0%,
+        rgba(125, 211, 252, 0.25) 100%
+      );
+    }
+
+    /* Milky White CaCO3 Precipitate State */
+    .liquid-container.milky-white {
+      background: linear-gradient(
+        180deg,
+        rgba(248, 250, 252, 0.94) 0%,
+        rgba(241, 245, 249, 0.98) 60%,
+        rgba(226, 232, 240, 1) 100%
+      );
+      box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.95);
+    }
+    .liquid-container.milky-white .meniscus {
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    /* ================= CALCIUM OXIDE LUMPS & POWDER ================= */
+    .solid-bed {
       position: absolute;
-      top: -220px;
-      left: 115px;
-      width: 10px;
-      height: 250px;
-      background: #f59e0b;
-      transition: top 0.8s ease;
+      bottom: 2px;
+      left: 18px;
+      right: 18px;
+      height: 55px;
       z-index: 5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 6px;
+      opacity: 0;
+      transform: translateY(-160px);
+      transition: opacity 0.4s ease, transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .solid-bed.dropped {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Realistic Quicklime (CaO) Stones */
+    .cao-stone {
+      background: radial-gradient(circle at 35% 30%, #ffffff, #e2e8f0 55%, #94a3b8 95%);
+      box-shadow: inset -3px -4px 6px rgba(0,0,0,0.35), 0 3px 6px rgba(0,0,0,0.45);
+      transition: all 1.8s ease;
+      position: relative;
+    }
+    .s1 { width: 44px; height: 34px; border-radius: 42% 58% 35% 65% / 54% 45% 55% 46%; }
+    .s2 { width: 52px; height: 40px; border-radius: 55% 45% 60% 40% / 48% 62% 38% 52%; }
+    .s3 { width: 38px; height: 30px; border-radius: 60% 40% 45% 55% / 50% 50% 50% 50%; }
+    .s4 { width: 34px; height: 26px; border-radius: 48% 52% 62% 38% / 58% 42% 58% 42%; }
+
+    /* Crumbled Slaked Lime Powder Layer */
+    .solid-bed.slaked .cao-stone {
+      height: 14px !important;
+      width: 55px !important;
+      border-radius: 50% 50% 25% 25%;
+      background: linear-gradient(180deg, #ffffff, #cbd5e1);
+      box-shadow: 0 0 12px rgba(255,255,255,0.8);
+      margin: 0 -8px;
+    }
+
+    /* ================= BENT GLASS CO2 DELIVERY TUBE ================= */
+    .delivery-tube {
+      position: absolute;
+      top: -280px;
+      left: calc(50% - 75px);
+      width: 90px;
+      height: 290px;
+      z-index: 6;
+      transition: top 1s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: none;
+    }
+    .delivery-tube.inserted {
+      top: 55px;
+    }
+    .tube-vertical {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 11px;
+      height: 275px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.45), rgba(255,255,255,0.12), rgba(255,255,255,0.5));
+      border-left: 1.5px solid rgba(255,255,255,0.65);
+      border-right: 1.5px solid rgba(255,255,255,0.65);
       border-radius: 4px;
     }
-    .straw.active {
-      top: 110px;
-    }
-    /* Bubbles & Steam */
-    .bubbles {
+    .tube-arm {
       position: absolute;
-      bottom: 20px;
-      width: 100%;
-      height: 150px;
+      top: 0;
+      left: -60px;
+      width: 150px;
+      height: 11px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.12), rgba(255,255,255,0.5));
+      border-top: 1.5px solid rgba(255,255,255,0.65);
+      border-bottom: 1.5px solid rgba(255,255,255,0.65);
+      border-radius: 6px 6px 0 0;
+    }
+
+    /* Water Stream Pouring Effect */
+    .water-stream {
+      position: absolute;
+      top: 0;
+      left: calc(50% - 30px);
+      width: 12px;
+      height: 0;
+      background: linear-gradient(90deg, rgba(186,230,253,0.7), rgba(56,189,248,0.4), rgba(255,255,255,0.8));
+      z-index: 4;
+      border-radius: 0 0 8px 8px;
+      transition: height 0.35s ease, opacity 0.35s ease;
+      opacity: 0;
+    }
+    .water-stream.pouring {
+      height: 360px;
+      opacity: 1;
+    }
+
+    /* Dynamic Bubbles & Steam Plumes */
+    .particle-layer {
+      position: absolute;
+      inset: 0;
       pointer-events: none;
-      display: none;
+      z-index: 7;
     }
-    .bubble {
+    .reaction-bubble {
       position: absolute;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.7);
+      bottom: 15px;
       border-radius: 50%;
-      animation: rise 1.5s infinite ease-in;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.2));
+      border: 1px solid rgba(255,255,255,0.6);
+      animation: bubbleRise linear infinite;
     }
-    @keyframes rise {
-      0% { transform: translateY(0) scale(0.8); opacity: 1; }
-      100% { transform: translateY(-130px) scale(1.3); opacity: 0; }
+    @keyframes bubbleRise {
+      0% { transform: translateY(0) scale(0.6); opacity: 0.95; }
+      70% { opacity: 0.85; }
+      100% { transform: translateY(-165px) scale(1.25); opacity: 0; }
     }
-    /* Info Panel */
-    .controls-panel {
+
+    .steam-cloud {
+      position: absolute;
+      bottom: 260px;
+      left: 35%;
+      width: 90px;
+      height: 90px;
+      background: radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%);
+      filter: blur(8px);
+      border-radius: 50%;
+      animation: steamRise 2.6s ease-out infinite;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+    @keyframes steamRise {
+      0% { transform: translateY(20px) scale(0.6); opacity: 0; }
+      40% { opacity: 0.55; }
+      100% { transform: translateY(-140px) scale(1.8); opacity: 0; }
+    }
+
+    /* ================= RIGHT CONTROL &OBSERVATION PANEL ================= */
+    .control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .notebook-card {
+      background: #141c2b;
+      border: 1px solid #2e3c51;
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
       flex: 1;
-      min-width: 300px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    .step-box {
-      background: #0f172a;
-      padding: 20px;
-      border-radius: 12px;
-      border-left: 5px solid #38bdf8;
-      margin-bottom: 15px;
+
+    .stage-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #263346;
+      padding-bottom: 12px;
+      margin-bottom: 12px;
     }
-    .step-title {
-      font-size: 20px;
-      font-weight: bold;
+    .stage-tag {
+      font-size: 0.78rem;
+      font-weight: 700;
       color: #38bdf8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .reaction-type-pill {
+      font-size: 0.75rem;
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+      padding: 3px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .obs-title {
+      font-size: 1.25rem;
+      color: #f8fafc;
       margin-bottom: 10px;
     }
-    .equation-box {
-      background: #1e293b;
-      padding: 12px;
-      border-radius: 8px;
-      font-family: monospace;
-      font-size: 15px;
-      color: #fde047;
-      margin: 12px 0;
-      border: 1px dashed #475569;
+
+    .obs-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #cbd5e1;
+      margin-bottom: 14px;
     }
-    .btn-group {
+
+    .chem-equation-card {
+      background: #090d16;
+      border: 1px solid #334155;
+      border-left: 4px solid #facc15;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+    .chem-eq-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #94a3b8;
+      margin-bottom: 4px;
+      letter-spacing: 0.8px;
+    }
+    .chem-eq-formula {
+      font-family: 'Courier New', monospace;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: #fde047;
+    }
+
+    /* Lab Properties Grid */
+    .props-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .prop-box {
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      padding: 8px 10px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .prop-label {
+      font-size: 0.68rem;
+      color: #64748b;
+      text-transform: uppercase;
+    }
+    .prop-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-top: 3px;
+    }
+
+    /* Interactive Step Buttons */
+    .button-rack {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      background: #141c2b;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid #2e3c51;
     }
-    button {
-      padding: 12px 15px;
-      border: none;
+
+    .lab-btn {
+      padding: 12px 14px;
       border-radius: 8px;
-      font-weight: bold;
+      border: 1px solid #38bdf8;
+      background: linear-gradient(180deg, #0284c7, #0369a1);
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.88rem;
       cursor: pointer;
-      background: #38bdf8;
-      color: #0f172a;
-      font-size: 14px;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
     }
-    button:hover:not(:disabled) {
-      background: #0284c7;
-      color: white;
+    .lab-btn:hover:not(:disabled) {
+      background: linear-gradient(180deg, #0ea5e9, #0284c7);
+      transform: translateY(-1px);
     }
-    button:disabled {
-      background: #334155;
-      color: #64748b;
+    .lab-btn:disabled {
+      background: #1e293b;
+      border-color: #334155;
+      color: #475569;
+      box-shadow: none;
       cursor: not-allowed;
     }
-    .reset-btn {
+    .btn-full {
       grid-column: span 2;
-      background: #ef4444;
-      color: white;
     }
-    .reset-btn:hover {
-      background: #dc2626 !important;
+    .btn-reset {
+      grid-column: span 2;
+      background: linear-gradient(180deg, #dc2626, #991b1b);
+      border-color: #f87171;
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    }
+    .btn-reset:hover {
+      background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
     }
   </style>
 </head>
 <body>
 
-  <h1>Interactive Chemistry Lab: Quicklime & Milky Water</h1>
-  <p class="subtitle">Click the buttons in order to perform the experiment and watch the chemical reactions!</p>
+  <!-- Top Header -->
+  <header class="lab-header">
+    <h1>🔬 Virtual Chemistry Lab: Quicklime (CaO) & Limewater (CO₂) Reaction</h1>
+    <span class="badge">Borosilicate Simulation</span>
+  </header>
 
-  <div class="lab-container">
-    <!-- Left Visual Stage -->
-    <div class="stage">
-      <div class="straw" id="straw"></div>
-      <div class="temp-label" id="tempLabel">Temp: 25°C</div>
-      
-      <div class="beaker" id="beaker">
-        <div class="liquid" id="liquid"></div>
-        <div class="bubbles" id="bubbles">
-          <div class="bubble" style="left: 20%; width: 10px; height: 10px; animation-delay: 0s;"></div>
-          <div class="bubble" style="left: 45%; width: 14px; height: 14px; animation-delay: 0.3s;"></div>
-          <div class="bubble" style="left: 70%; width: 8px; height: 8px; animation-delay: 0.6s;"></div>
-          <div class="bubble" style="left: 35%; width: 12px; height: 12px; animation-delay: 0.9s;"></div>
+  <main class="workspace">
+    <!-- LEFT: REALISTIC LABORATORY BENCH VIEWPORT -->
+    <section class="lab-viewport">
+      <!-- Blurred Background Shelf with Reagent Bottles -->
+      <div class="lab-shelf">
+        <div class="reagent-bottle b1"></div>
+        <div class="reagent-bottle b2"></div>
+        <div class="reagent-bottle b3"></div>
+      </div>
+
+      <!-- Digital Temperature Readout -->
+      <div class="digital-meter">
+        <div class="meter-label"> Digital Thermocouple</div>
+        <div class="meter-screen" id="digitalTemp">25.0 °C</div>
+      </div>
+
+      <!-- Retort Stand & Clamp -->
+      <div class="retort-base"></div>
+      <div class="retort-rod"></div>
+      <div class="retort-clamp"></div>
+
+      <!-- Glass Thermometer Probe -->
+      <div class="thermometer-glass">
+        <div class="mercury-column" id="mercuryCol"></div>
+        <div class="thermometer-bulb"></div>
+      </div>
+
+      <!-- Bent Glass CO2 Gas Delivery Tube -->
+      <div class="delivery-tube" id="deliveryTube">
+        <div class="tube-arm"></div>
+        <div class="tube-vertical"></div>
+      </div>
+
+      <!-- Pouring Distilled Water Stream -->
+      <div class="water-stream" id="waterStream"></div>
+
+      <!-- Rising Steam Plumes (For Exothermic Slaking of Lime) -->
+      <div class="steam-cloud" id="steam1" style="animation-delay: 0s;"></div>
+      <div class="steam-cloud" id="steam2" style="left: 45%; animation-delay: 0.8s;"></div>
+      <div class="steam-cloud" id="steam3" style="left: 30%; animation-delay: 1.5s;"></div>
+
+      <!-- 250mL Borosilicate Glass Beaker -->
+      <div class="beaker-wrapper">
+        <div class="beaker-rim"></div>
+        <div class="beaker-body" id="beakerBody">
+          <div class="glass-streak"></div>
+          <div class="brand-stamp">BORO 3.3<br>250 mL</div>
+
+          <!-- Volume Graduations -->
+          <div class="graduations">
+            <div class="grad-line">200mL</div>
+            <div class="grad-line">150mL</div>
+            <div class="grad-line">100mL</div>
+            <div class="grad-line">50mL</div>
+          </div>
+
+          <!-- Liquid Layer with Meniscus -->
+          <div class="liquid-container" id="liquidContainer">
+            <div class="meniscus"></div>
+            <div class="particle-layer" id="bubbleLayer"></div>
+          </div>
+
+          <!-- Solid Calcium Oxide Lumps / Slaked Powder -->
+          <div class="solid-bed" id="solidBed">
+            <div class="cao-stone s1"></div>
+            <div class="cao-stone s2"></div>
+            <div class="cao-stone s3"></div>
+            <div class="cao-stone s4"></div>
+          </div>
         </div>
-        <div class="lumps-container" id="lumps">
-          <div class="lump" id="l1"></div>
-          <div class="lump" id="l2"></div>
-          <div class="lump" id="l3"></div>
+      </div>
+
+      <!-- Granite Lab Benchtop -->
+      <div class="bench">
+        <div class="bench-glow" id="benchGlow"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: SCIENTIFIC NOTEBOOK & CONTROLS -->
+    <section class="control-panel">
+      <div class="notebook-card">
+        <div>
+          <div class="stage-indicator">
+            <span class="stage-tag" id="stageTag">Stage 0 of 5 • Lab Setup</span>
+            <span class="reaction-type-pill" id="reactionPill">Standby</span>
+          </div>
+
+          <h2 class="obs-title" id="obsTitle">Apparatus Ready on Lab Bench</h2>
+          <p class="obs-text" id="obsText">
+            A clean, dry 250 mL borosilicate glass beaker is placed on the granite bench with a calibrated thermometer reading room temperature (<b>25.0 °C</b>).<br><br>
+            Click <b>Step 1</b> below to introduce solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker.
+          </p>
+        </div>
+
+        <div>
+          <div class="chem-equation-card">
+            <div class="chem-eq-label">Balanced Chemical Equation</div>
+            <div class="chem-eq-formula" id="eqFormula">Awaiting reactants...</div>
+          </div>
+
+          <div class="props-grid">
+            <div class="prop-box">
+              <div class="prop-label">Main Compound</div>
+              <div class="prop-val" id="propCompound">Empty Beaker</div>
+            </div>
+            <div class="prop-box">
+              <div class="prop-label">Appearance</div>
+              <div class="prop-val" id="propAppearance">Transparent</div>
+            </div>
+            <div class="prop-box">
+              <div class="prop-label">pH / Nature</div>
+              <div class="prop-val" id="propPH">Neutral (7.0)</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div class="thermometer">
-        <div class="mercury" id="mercury"></div>
+      <!-- Action Buttons -->
+      <div class="button-rack">
+        <button class="lab-btn" id="btn1" onclick="runStep1()">1. Add Quicklime (CaO)</button>
+        <button class="lab-btn" id="btn2" onclick="runStep2()" disabled>2. Pour Water (H₂O)</button>
+        <button class="lab-btn" id="btn3" onclick="runStep3()" disabled>3. Decant & Filter Limewater</button>
+        <button class="lab-btn" id="btn4" onclick="runStep4()" disabled>4. Pass CO₂ Gas (Milky)</button>
+        <button class="lab-btn btn-full" id="btn5" onclick="runStep5()" disabled>5. Bonus: Pass Excess CO₂ Gas (Turns Clear Again!)</button>
+        <button class="lab-btn btn-reset" onclick="resetExperiment()">↺ Reset Laboratory Apparatus</button>
       </div>
-    </div>
-
-    <!-- Right Explanation & Controls -->
-    <div class="controls-panel">
-      <div class="step-box">
-        <div class="step-title" id="stepTitle">Ready to Start!</div>
-        <p id="stepDesc">We have an empty glass beaker and a thermometer at room temperature (25°C). Click <b>Step 1</b> below to add Calcium Oxide (Quicklime).</p>
-        <div class="equation-box" id="equationBox">Chemical Equation will appear here...</div>
-      </div>
-
-      <div class="btn-group">
-        <button id="btn1" onclick="step1()">Step 1: Add CaO (Quicklime)</button>
-        <button id="btn2" onclick="step2()" disabled>Step 2: Add Water (H₂O)</button>
-        <button id="btn3" onclick="step3()" disabled>Step 3: Filter into Limewater</button>
-        <button id="btn4" onclick="step4()" disabled>Step 4: Blow CO₂ Gas</button>
-        <button class="reset-btn" onclick="resetLab()">Reset Experiment</button>
-      </div>
-    </div>
-  </div>
+    </section>
+  </main>
 
   <script>
-    const lumps = document.getElementById('lumps');
-    const l1 = document.getElementById('l1');
-    const l2 = document.getElementById('l2');
-    const l3 = document.getElementById('l3');
-    const liquid = document.getElementById('liquid');
-    const beaker = document.getElementById('beaker');
-    const mercury = document.getElementById('mercury');
-    const tempLabel = document.getElementById('tempLabel');
-    const bubbles = document.getElementById('bubbles');
-    const straw = document.getElementById('straw');
+    const solidBed = document.getElementById('solidBed');
+    const liquidContainer = document.getElementById('liquidContainer');
+    const beakerBody = document.getElementById('beakerBody');
+    const benchGlow = document.getElementById('benchGlow');
+    const waterStream = document.getElementById('waterStream');
+    const deliveryTube = document.getElementById('deliveryTube');
+    const bubbleLayer = document.getElementById('bubbleLayer');
+    const mercuryCol = document.getElementById('mercuryCol');
+    const digitalTemp = document.getElementById('digitalTemp');
 
-    const stepTitle = document.getElementById('stepTitle');
-    const stepDesc = document.getElementById('stepDesc');
-    const equationBox = document.getElementById('equationBox');
+    const steam1 = document.getElementById('steam1');
+    const steam2 = document.getElementById('steam2');
+    const steam3 = document.getElementById('steam3');
+
+    const stageTag = document.getElementById('stageTag');
+    const reactionPill = document.getElementById('reactionPill');
+    const obsTitle = document.getElementById('obsTitle');
+    const obsText = document.getElementById('obsText');
+    const eqFormula = document.getElementById('eqFormula');
+    const propCompound = document.getElementById('propCompound');
+    const propAppearance = document.getElementById('propAppearance');
+    const propPH = document.getElementById('propPH');
 
     const btn1 = document.getElementById('btn1');
     const btn2 = document.getElementById('btn2');
     const btn3 = document.getElementById('btn3');
     const btn4 = document.getElementById('btn4');
+    const btn5 = document.getElementById('btn5');
 
-    function step1() {
-      lumps.style.opacity = '1';
-      stepTitle.innerText = "Step 1: Calcium Oxide Added";
-      stepDesc.innerHTML = "We added white solid lumps of <b>Calcium Oxide (CaO)</b>, also called <i>Quicklime</i>, to the beaker. Now let's pour water onto it!";
-      equationBox.innerText = "Reactant: CaO (s) [Quicklime]";
+    let tempTimer = null;
+
+    function animateTemperature(start, end, duration, isHot) {
+      if (tempTimer) clearInterval(tempTimer);
+      const steps = 30;
+      const stepTime = duration / steps;
+      let currentStep = 0;
+
+      if (isHot) {
+        digitalTemp.classList.add('hot');
+      } else {
+        digitalTemp.classList.remove('hot');
+      }
+
+      tempTimer = setInterval(() => {
+        currentStep++;
+        const val = start + ((end - start) * (currentStep / steps));
+        digitalTemp.innerText = val.toFixed(1) + " °C";
+        if (currentStep >= steps) clearInterval(tempTimer);
+      }, stepTime);
+    }
+
+    function spawnBubbles(count, speedSec) {
+      bubbleLayer.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const b = document.createElement('div');
+        b.className = 'reaction-bubble';
+        const size = Math.floor(Math.random() * 9) + 5;
+        b.style.width = size + 'px';
+        b.style.height = size + 'px';
+        b.style.left = (Math.floor(Math.random() * 75) + 12) + '%';
+        b.style.animationDuration = (Math.random() * 0.7 + speedSec) + 's';
+        b.style.animationDelay = (Math.random() * 1.2) + 's';
+        bubbleLayer.appendChild(b);
+      }
+    }
+
+    function setSteam(active) {
+      const display = active ? 'block' : 'none';
+      steam1.style.display = display;
+      steam2.style.display = display;
+      steam3.style.display = display;
+    }
+
+    //init steam off
+    setSteam(false);
+
+    // STEP 1: Add Quicklime (CaO)
+    function runStep1() {
+      solidBed.classList.add('dropped');
+
+      stageTag.innerText = "Stage 1 of 5 • Reactant Added";
+      reactionPill.innerText = "Solid Oxide";
+      obsTitle.innerText = "Calcium Oxide (Quicklime) Placed in Beaker";
+      obsText.innerHTML = `Hard, white amorphous lumps of <b>Calcium Oxide (CaO)</b> are placed at the bottom of the beaker.<br><br>
+      • <b>Common Name:</b> Quicklime (or Burnt Lime)<br>
+      • <b>State:</b> White crystalline solid at room temperature (25.0 °C).<br>
+      Click <b>Step 2</b> to slowly add distilled water onto the quicklime.`;
+      eqFormula.innerText = "CaO (s) [Quicklime — Ready to react]";
+      propCompound.innerText = "CaO (Solid)";
+      propAppearance.innerText = "White Lumps";
+      propPH.innerText = "Basic Oxide";
+
       btn1.disabled = true;
       btn2.disabled = false;
     }
 
-    function step2() {
-      liquid.style.height = '65%';
-      beaker.classList.add('hot');
-      mercury.style.height = '85%';
-      mercury.style.background = '#ef4444';
-      tempLabel.innerText = "Temp: 85°C (HOT!)";
-      tempLabel.style.color = "#fca5a5";
-      bubbles.style.display = 'block';
+    // STEP 2: Pour Water -> Exothermic Slaking of Lime
+    function runStep2() {
+      waterStream.classList.add('pouring');
+      liquidContainer.style.height = '68%';
 
-      l1.classList.add('slaked');
-      l2.classList.add('slaked');
-      l3.classList.add('slaked');
+      setTimeout(() => {
+        waterStream.classList.remove('pouring');
+        solidBed.classList.add('slaked');
+        liquidContainer.classList.add('slaked-suspension');
+        beakerBody.classList.add('exothermic');
+        benchGlow.classList.add('hot');
 
-      stepTitle.innerText = "Step 2: Exothermic Combination Reaction!";
-      stepDesc.innerHTML = "<b>Observation:</b> Water reacts vigorously with CaO with a hissing sound! The hard lumps crumble into fine powder of <b>Calcium Hydroxide (Slaked Lime)</b>. <br><br>Notice the red glow and thermometer: a huge amount of <b>Heat</b> is released (Exothermic Reaction).";
-      equationBox.innerText = "CaO (s) + H₂O (l) → Ca(OH)₂ (aq) + Heat ↑";
+        mercuryCol.style.height = '86%';
+        animateTemperature(25.0, 88.5, 1600, true);
+        spawnBubbles(24, 0.9);
+        setSteam(true);
+      }, 500);
+
+      stageTag.innerText = "Stage 2 of 5 • Slaking of Lime";
+      reactionPill.innerText = "Exothermic + Combination";
+      obsTitle.innerText = "Vigorous Reaction! Slaked Lime Formed";
+      obsText.innerHTML = `<b>What happens:</b> Water reacts vigorously with Quicklime (CaO) accompanied by a loud <b>hissing sound</b> and steam!<br><br>
+      • <b>Why the beaker gets HOT:</b> This is a strongly <b>Exothermic Combination Reaction</b>—the temperature surges to <b>88.5 °C</b>.<br>
+      • <b>Product:</b> The hard lumps crumble into fine white powder of <b>Calcium Hydroxide [Ca(OH)₂]</b>, known as <i>Slaked Lime</i>, forming a cloudy white suspension called <i>Milk of Lime</i>.`;
+      eqFormula.innerText = "CaO (s) + H₂O (l) → Ca(OH)₂ (s/aq) + Heat (ΔH = -63.7 kJ/mol)";
+      propCompound.innerText = "Ca(OH)₂ [Slaked Lime]";
+      propAppearance.innerText = "Cloudy Suspension";
+      propPH.innerText = "Alkaline (pH ~12.4)";
 
       btn2.disabled = true;
       btn3.disabled = false;
     }
 
-    function step3() {
-      beaker.classList.remove('hot');
-      mercury.style.height = '25%';
-      mercury.style.background = '#38bdf8';
-      tempLabel.innerText = "Temp: 28°C";
-      tempLabel.style.color = "#f8fafc";
-      bubbles.style.display = 'none';
-      lumps.style.opacity = '0';
+    // STEP 3: Filter into Clear Limewater
+    function runStep3() {
+      beakerBody.classList.remove('exothermic');
+      benchGlow.classList.remove('hot');
+      setSteam(false);
+      bubbleLayer.innerHTML = '';
 
-      stepTitle.innerText = "Step 3: Clear Limewater Prepared";
-      stepDesc.innerHTML = "After cooling and filtering out the extra undissolved solid at the bottom, we get a clear aqueous solution of Calcium Hydroxide called <b>Limewater</b>.<br><br>Now, let's see how it turns <b>MILKY</b>!";
-      equationBox.innerText = "Solution: Clear Ca(OH)₂ (aq) [Limewater]";
+      solidBed.style.opacity = '0';
+      liquidContainer.classList.remove('slaked-suspension');
+      liquidContainer.classList.add('clear-limewater');
+
+      mercuryCol.style.height = '26%';
+      animateTemperature(88.5, 27.0, 1400, false);
+
+      stageTag.innerText = "Stage 3 of 5 • Filtration";
+      reactionPill.innerText = "Aqueous Solution";
+      obsTitle.innerText = "Clear Limewater Obtained";
+      obsText.innerHTML = `<b>Preparing Limewater:</b> Calcium Hydroxide is sparingly soluble in water. When the mixture cools and the undissolved white solid settles and is filtered off, we obtain a crystal-clear, colorless solution called <b>Limewater [Ca(OH)₂ (aq)]</b>.<br><br>
+      Click <b>Step 4</b> to bubble <b>Carbon Dioxide (CO₂)</b> gas through this clear limewater and see why it turns <b>milky</b>!`;
+      eqFormula.innerText = "Ca(OH)₂ (s) + H₂O (l) ⇌ Ca²⁺ (aq) + 2OH⁻ (aq) [Clear Limewater]";
+      propCompound.innerText = "Ca(OH)₂ (aq)";
+      propAppearance.innerText = "Clear & Colorless";
+      propPH.innerText = "Basic (pH ~12.4)";
 
       btn3.disabled = true;
       btn4.disabled = false;
     }
 
-    function step4() {
-      straw.classList.add('active');
-      bubbles.style.display = 'block';
-      setTimeout(() => {
-        liquid.classList.add('milky');
-      }, 600);
+    // STEP 4: Pass CO2 -> Turns Milky White (CaCO3 Precipitate)
+    function runStep4() {
+      deliveryTube.classList.add('inserted');
+      spawnBubbles(18, 1.1);
 
-      stepTitle.innerText = "Step 4: Water Turns Milky!";
-      stepDesc.innerHTML = "<b>Why did it turn milky?</b> When we blow <b>Carbon Dioxide (CO₂)</b> through the tube into clear Limewater, it reacts with Ca(OH)₂ to form insoluble white particles (precipitate) of <b>Calcium Carbonate (CaCO₃)</b> floating in the water. This insoluble CaCO₃ makes the water look milky white!";
-      equationBox.innerText = "Ca(OH)₂ (aq) + CO₂ (g) → CaCO₃ (s) [Milky White ppt] + H₂O (l)";
+      setTimeout(() => {
+        liquidContainer.classList.remove('clear-limewater');
+        liquidContainer.classList.add('milky-white');
+      }, 650);
+
+      stageTag.innerText = "Stage 4 of 5 • Carbon Dioxide Test";
+      reactionPill.innerText = "Precipitation Reaction";
+      obsTitle.innerText = "Limewater Turns Milky White!";
+      obsText.innerHTML = `<b>Why does the water turn milky?</b><br>
+      When <b>Carbon Dioxide (CO₂)</b> gas is bubbled into clear Limewater [Ca(OH)₂], they react chemically to form <b>Calcium Carbonate (CaCO₃)</b>.<br><br>
+      • <b>Reason for Milkiness:</b> Calcium Carbonate (CaCO₃) is <b>completely insoluble in water</b>. Billions of microscopic white solid particles (precipitate) remain suspended throughout the water, turning the clear liquid <b>opaque milky-white</b>!`;
+      eqFormula.innerText = "Ca(OH)₂ (aq) + CO₂ (g) → CaCO₃ (s)↓ [White Milky Ppt] + H₂O (l)";
+      propCompound.innerText = "CaCO₃ (s) Precipitate";
+      propAppearance.innerText = "Opaque Milky White";
+      propPH.innerText = "Near Neutral (~8.3)";
 
       btn4.disabled = true;
+      btn5.disabled = false;
     }
 
-    function resetLab() {
-      lumps.style.opacity = '0';
-      l1.classList.remove('slaked');
-      l2.classList.remove('slaked');
-      l3.classList.remove('slaked');
-      liquid.style.height = '0%';
-      liquid.classList.remove('milky');
-      beaker.classList.remove('hot');
-      mercury.style.height = '20%';
-      mercury.style.background = '#38bdf8';
-      tempLabel.innerText = "Temp: 25°C";
-      tempLabel.style.color = "#f8fafc";
-      bubbles.style.display = 'none';
-      straw.classList.remove('active');
+    // STEP 5: Bonus Excess CO2 -> Milky Water Turns Clear Again
+    function runStep5() {
+      spawnBubbles(26, 0.8);
 
-      stepTitle.innerText = "Ready to Start!";
-      stepDesc.innerHTML = "We have an empty glass beaker and a thermometer at room temperature (25°C). Click <b>Step 1</b> below to add Calcium Oxide (Quicklime).";
-      equationBox.innerText = "Chemical Equation will appear here...";
+      setTimeout(() => {
+        liquidContainer.classList.remove('milky-white');
+        liquidContainer.classList.add('clear-limewater');
+      }, 800);
+
+      stageTag.innerText = "Stage 5 of 5 • Excess CO₂ Reaction";
+      reactionPill.innerText = "Dissolution Reaction";
+      obsTitle.innerText = "Milkiness Disappears on Passing Excess CO₂!";
+      obsText.innerHTML = `<b>What happens if you keep blowing CO₂ for a long time?</b><br>
+      The insoluble white Calcium Carbonate (CaCO₃) reacts further with excess Carbon Dioxide and water to form <b>Calcium Hydrogen Carbonate [Ca(HCO₃)₂]</b> (also called Calcium Bicarbonate).<br><br>
+      • <b>Why it turns clear again:</b> Because <b>Ca(HCO₃)₂ is soluble in water</b>, the white precipitate dissolves completely and the solution becomes transparent again!`;
+      eqFormula.innerText = "CaCO₃ (s) + CO₂ (g) + H₂O (l) → Ca(HCO₃)₂ (aq) [Colorless Soluble]";
+      propCompound.innerText = "Ca(HCO₃)₂ (aq)";
+      propAppearance.innerText = "Clear Solution";
+      propPH.innerText = "Mildly Acidic (~6.5)";
+
+      btn5.disabled = true;
+    }
+
+    // RESET
+    function resetExperiment() {
+      if (tempTimer) clearInterval(tempTimer);
+      waterStream.classList.remove('pouring');
+      deliveryTube.classList.remove('inserted');
+      beakerBody.classList.remove('exothermic');
+      benchGlow.classList.remove('hot');
+      setSteam(false);
+      bubbleLayer.innerHTML = '';
+
+      liquidContainer.style.height = '0%';
+      liquidContainer.className = 'liquid-container';
+
+      solidBed.className = 'solid-bed';
+      solidBed.style.opacity = '';
+
+      mercuryCol.style.height = '22%';
+      digitalTemp.classList.remove('hot');
+      digitalTemp.innerText = "25.0 °C";
+
+      stageTag.innerText = "Stage 0 of 5 • Lab Setup";
+      reactionPill.innerText = "Standby";
+      obsTitle.innerText = "Apparatus Ready on Lab Bench";
+      obsText.innerHTML = `A clean, dry 250 mL borosilicate glass beaker is placed on the granite bench with a calibrated thermometer reading room temperature (<b>25.0 °C</b>).<br><br>
+      Click <b>Step 1</b> below to introduce solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker.`;
+      eqFormula.innerText = "Awaiting reactants...";
+      propCompound.innerText = "Empty Beaker";
+      propAppearance.innerText = "Transparent";
+      propPH.innerText = "Neutral (7.0)";
 
       btn1.disabled = false;
       btn2.disabled = true;
       btn3.disabled = true;
       btn4.disabled = true;
+      btn5.disabled = true;
     }
   </script>
 </body>
