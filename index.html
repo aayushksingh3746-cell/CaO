@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elastic Physics Chemistry Lab: Quicklime & Limewater</title>
+  <title>ChemLab Pro: Quicklime & Limewater Interactive Workstation</title>
   <style>
     :root {
       --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
       --spring-wobble: cubic-bezier(0.68, -0.6, 0.32, 1.6);
-      --smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+      --panel-bg: #0f1624;
+      --panel-border: #26354d;
+      --cyan-glow: #38bdf8;
     }
 
     * {
@@ -19,123 +21,285 @@
     }
 
     body {
-      background: #070b12;
+      background: #060911;
+      background-image: radial-gradient(circle at 50% 0%, #111a2e 0%, #060911 75%);
       color: #f1f5f9;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 18px;
+      padding: 16px;
       overflow-x: hidden;
     }
 
-    /* Header with Elastic Entrance */
-    .lab-header {
-      max-width: 1180px;
+    /* ================= TOP LAB TELEMETRY BAR ================= */
+    .lab-navbar {
+      max-width: 1220px;
       width: 100%;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(90deg, #0f172a, #1e293b, #0f172a);
-      padding: 14px 28px;
+      gap: 12px;
+      background: rgba(15, 22, 36, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 12px 22px;
       border-radius: 14px;
-      border: 1px solid #334155;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      margin-bottom: 18px;
-      animation: dropElastic 0.8s var(--spring-bounce) forwards;
+      border: 1px solid var(--panel-border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.65);
+      margin-bottom: 16px;
+      animation: navDrop 0.7s var(--spring-bounce);
     }
 
-    @keyframes dropElastic {
-      0% { opacity: 0; transform: translateY(-40px) scale(0.95); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
+    @keyframes navDrop {
+      0% { transform: translateY(-35px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
-    .lab-header h1 {
-      font-size: 1.35rem;
-      color: #f8fafc;
+    .brand-group {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
-    .badge {
-      background: linear-gradient(135deg, #0ea5e9, #2563eb);
-      color: #fff;
-      font-size: 0.75rem;
-      padding: 5px 12px;
-      border-radius: 20px;
+    .lab-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: 0.3px;
+    }
+    .brand-title p {
+      font-size: 0.72rem;
+      color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-weight: 700;
-      box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
-      animation: badgePulse 2.5s infinite ease-in-out;
     }
 
-    @keyframes badgePulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.06); }
+    .telemetry-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    /* Main Workspace Layout */
+    .status-chip {
+      background: #090d16;
+      border: 1px solid #334155;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: #cbd5e1;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 8px #10b981;
+      animation: blink 2s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .audio-btn {
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.35s var(--spring-wobble), background 0.2s;
+    }
+    .audio-btn:hover {
+      transform: scale(1.06);
+      background: rgba(56, 189, 248, 0.15);
+    }
+    .audio-btn.muted {
+      border-color: #64748b;
+      color: #94a3b8;
+    }
+
+    /* ================= MAIN WORKSPACE GRID ================= */
     .workspace {
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
-      gap: 24px;
-      max-width: 1180px;
+      grid-template-columns: 1.32fr 1fr;
+      gap: 20px;
+      max-width: 1220px;
       width: 100%;
     }
 
-    @media (max-width: 920px) {
+    @media (max-width: 960px) {
       .workspace { grid-template-columns: 1fr; }
     }
 
-    /* ================= LEFT: REALISTIC LAB STAGE ================= */
-    .lab-viewport {
-      height: 550px;
+    /* ================= LEFT: FUME HOOD LAB VIEWPORT ================= */
+    .fume-hood-frame {
+      height: 575px;
       border-radius: 18px;
       position: relative;
       overflow: hidden;
-      border: 2px solid #334155;
-      box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.9), 0 15px 35px rgba(0,0,0,0.65);
-      background-color: #111927;
+      border: 3px solid #283548;
+      box-shadow: 
+        inset 0 0 90px rgba(0, 0, 0, 0.92),
+        0 18px 40px rgba(0, 0, 0, 0.7);
+      background-color: #0e1522;
       background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        radial-gradient(circle at 50% 40%, rgba(56, 189, 248, 0.14), transparent 70%);
-      background-size: 40px 40px, 40px 40px, 100% 100%;
+        linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        radial-gradient(circle at 50% 15%, rgba(186, 230, 253, 0.16), transparent 65%);
+      background-size: 36px 36px, 36px 36px, 100% 100%;
     }
 
-    /* Background Shelf & Floating Idle Bottles */
+    /* Overhead Fume Hood Fluorescent Lamp */
+    .hood-ceiling {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 36px;
+      background: linear-gradient(180deg, #1e293b, #0f172a);
+      border-bottom: 2px solid #334155;
+      z-index: 12;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 0.7rem;
+      color: #94a3b8;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .hood-light-tube {
+      position: absolute;
+      top: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60%;
+      height: 6px;
+      background: #e0f2fe;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 0 25px #38bdf8, 0 0 50px rgba(56, 189, 248, 0.4);
+      z-index: 11;
+    }
+
+    /* Fume Hood Side Ruler Markings */
+    .hood-sash-ruler {
+      position: absolute;
+      left: 10px;
+      top: 55px;
+      bottom: 120px;
+      width: 18px;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.25) 0px,
+        rgba(255,255,255,0.25) 1px,
+        transparent 1px,
+        transparent 12px
+      );
+      z-index: 4;
+      opacity: 0.6;
+    }
+
+    /* Background Reagent Shelf */
     .lab-shelf {
       position: absolute;
-      top: 75px;
-      left: 30px;
-      width: 220px;
+      top: 95px;
+      left: 42px;
+      width: 210px;
       height: 10px;
       background: linear-gradient(180deg, #334155, #0f172a);
       border-radius: 4px;
       box-shadow: 0 8px 15px rgba(0,0,0,0.6);
-      opacity: 0.65;
-      transition: transform 0.5s var(--spring-bounce);
-    }
-    .lab-viewport:hover .lab-shelf {
-      transform: translateX(6px);
+      opacity: 0.75;
     }
     .reagent-bottle {
       position: absolute;
       bottom: 10px;
-      border: 1.5px solid rgba(255,255,255,0.4);
+      border: 1.5px solid rgba(255,255,255,0.45);
       border-radius: 6px 6px 3px 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 800;
+      color: rgba(255,255,255,0.85);
       transform-origin: bottom center;
       animation: bottleSway 4s ease-in-out infinite alternate;
     }
-    .b1 { left: 20px; width: 36px; height: 60px; background-color: rgba(217, 119, 6, 0.45); animation-delay: 0.2s; }
-    .b2 { left: 70px; width: 42px; height: 72px; background-color: rgba(56, 189, 248, 0.28); animation-delay: 0.7s; }
-    .b3 { left: 125px; width: 32px; height: 50px; background-color: rgba(255, 255, 255, 0.35); animation-delay: 1.2s; }
+    .b1 { left: 16px; width: 42px; height: 62px; background-color: rgba(217, 119, 6, 0.45); }
+    .b2 { left: 72px; width: 46px; height: 74px; background-color: rgba(56, 189, 248, 0.28); animation-delay: 0.7s; }
+    .b3 { left: 132px; width: 38px; height: 52px; background-color: rgba(255, 255, 255, 0.3); animation-delay: 1.2s; }
 
     @keyframes bottleSway {
       0% { transform: scaleY(1); }
       100% { transform: scaleY(1.03); }
+    }
+
+    /* Molecular Inspector Floating HUD (Bottom-Left of Hood) */
+    .molecular-hud {
+      position: absolute;
+      bottom: 122px;
+      left: 36px;
+      width: 155px;
+      background: rgba(9, 13, 22, 0.88);
+      border: 1.5px solid #334155;
+      border-radius: 12px;
+      padding: 10px;
+      z-index: 10;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+      transition: transform 0.5s var(--spring-wobble), border-color 0.3s;
+    }
+    .molecular-hud.hud-pop {
+      transform: scale(1.08);
+      border-color: #38bdf8;
+    }
+    .hud-header {
+      font-size: 0.62rem;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #38bdf8;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .ion-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+    .ion-badge {
+      font-family: monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
     }
 
     /* Granite Laboratory Benchtop */
@@ -144,10 +308,10 @@
       bottom: 0;
       left: 0;
       width: 100%;
-      height: 110px;
+      height: 108px;
       background: 
         radial-gradient(circle at 50% 0%, rgba(255,255,255,0.09), transparent 60%),
-        linear-gradient(180deg, #27303f 0%, #171d26 30%, #0b0f15 100%);
+        linear-gradient(180deg, #242d3c 0%, #151b24 30%, #090c10 100%);
       border-top: 3px solid #475569;
       box-shadow: 0 -10px 30px rgba(0,0,0,0.7);
       z-index: 2;
@@ -156,7 +320,7 @@
     .bench-glow {
       position: absolute;
       top: 5px;
-      left: 48%;
+      left: 50%;
       transform: translateX(-50%);
       width: 260px;
       height: 60px;
@@ -168,7 +332,6 @@
       background: radial-gradient(ellipse, rgba(239, 68, 68, 0.65) 0%, rgba(249, 115, 22, 0.25) 50%, transparent 75%);
       animation: glowPulse 1.2s infinite alternate ease-in-out;
     }
-
     @keyframes glowPulse {
       0% { transform: translateX(-50%) scale(0.95); opacity: 0.85; }
       100% { transform: translateX(-50%) scale(1.08); opacity: 1; }
@@ -178,7 +341,7 @@
     .retort-base {
       position: absolute;
       bottom: 65px;
-      right: 75px;
+      right: 65px;
       width: 140px;
       height: 16px;
       background: linear-gradient(90deg, #334155, #64748b, #1e293b);
@@ -189,7 +352,7 @@
     .retort-rod {
       position: absolute;
       bottom: 80px;
-      right: 110px;
+      right: 100px;
       width: 10px;
       height: 410px;
       background: linear-gradient(90deg, #475569, #cbd5e1, #334155);
@@ -198,8 +361,8 @@
     }
     .retort-clamp {
       position: absolute;
-      top: 125px;
-      right: 105px;
+      top: 145px;
+      right: 95px;
       width: 115px;
       height: 12px;
       background: linear-gradient(180deg, #94a3b8, #475569);
@@ -208,13 +371,13 @@
       box-shadow: 0 4px 8px rgba(0,0,0,0.5);
     }
 
-    /* Digital LCD Monitor with Elastic Pop */
+    /* Digital LCD Monitor */
     .digital-meter {
       position: absolute;
-      top: 50px;
-      right: 30px;
+      top: 62px;
+      right: 25px;
       width: 155px;
-      background: #0f172a;
+      background: #090d16;
       border: 2px solid #475569;
       border-radius: 12px;
       padding: 10px 14px;
@@ -227,14 +390,14 @@
       border-color: #ef4444;
     }
     .meter-label {
-      font-size: 0.65rem;
+      font-size: 0.63rem;
       color: #94a3b8;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .meter-screen {
       font-family: 'Courier New', monospace;
-      font-size: 1.55rem;
+      font-size: 1.5rem;
       font-weight: 700;
       color: #38bdf8;
       text-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
@@ -250,9 +413,9 @@
     .thermometer-glass {
       position: absolute;
       bottom: 105px;
-      right: 205px;
+      right: 195px;
       width: 14px;
-      height: 320px;
+      height: 315px;
       background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.1), rgba(255,255,255,0.4));
       border: 1.5px solid rgba(255,255,255,0.55);
       border-radius: 10px;
@@ -300,7 +463,7 @@
     .beaker-wrapper {
       position: absolute;
       bottom: 72px;
-      left: 48%;
+      left: 52%;
       transform: translateX(-50%);
       width: 220px;
       height: 270px;
@@ -308,7 +471,6 @@
       transform-origin: bottom center;
     }
 
-    /* Elastic Impact Bounce when CaO Lumps Drop */
     .beaker-wrapper.impact-bounce {
       animation: beakerElasticImpact 0.75s var(--spring-wobble);
     }
@@ -320,7 +482,6 @@
       100% { transform: translateX(-50%) scale(1, 1); }
     }
 
-    /* Exothermic Thermal Vibration */
     .beaker-wrapper.thermal-shake {
       animation: thermalVibration 0.35s infinite alternate ease-in-out;
     }
@@ -426,18 +587,16 @@
       pointer-events: none;
     }
 
-    /* ================= ELASTIC LIQUID & WAVE MENISCUS ================= */
+    /* Liquid & Meniscus */
     .liquid-container {
       position: absolute;
       bottom: 0;
       left: 0;
       width: 100%;
       height: 0%;
-      /* Elastic overshoot when water fills up */
       transition: height 1.5s var(--spring-bounce), background 1.6s ease, box-shadow 1.6s ease;
       background: linear-gradient(180deg, rgba(56, 189, 248, 0.25) 0%, rgba(14, 165, 233, 0.42) 100%);
       z-index: 4;
-      transform-origin: bottom center;
     }
 
     .meniscus {
@@ -452,7 +611,6 @@
       transition: background 1.6s ease;
     }
 
-    /* Elastic Sloshing Wave when agitated */
     .liquid-container.sloshing .meniscus {
       animation: meniscusWave 1.1s infinite ease-in-out alternate;
     }
@@ -492,7 +650,7 @@
       background: rgba(255, 255, 255, 0.95);
     }
 
-    /* ================= ELASTIC CaO STONES ================= */
+    /* Quicklime Stones */
     .solid-bed {
       position: absolute;
       bottom: 4px;
@@ -520,7 +678,6 @@
         border-radius 1.5s ease;
     }
 
-    /* Staggered Elastic Drop for Each Stone */
     .solid-bed.dropped .cao-stone {
       opacity: 1;
       transform: translateY(0) scale(1) rotate(0deg);
@@ -545,20 +702,19 @@
       transition-delay: 0s !important;
     }
 
-    /* ================= BENT GLASS CO2 DELIVERY TUBE ================= */
+    /* Bent Glass CO2 Delivery Tube */
     .delivery-tube {
       position: absolute;
       top: -290px;
-      left: calc(48% - 75px);
+      left: calc(52% - 75px);
       width: 90px;
       height: 290px;
       z-index: 6;
-      /* Elastic spring insertion */
       transition: top 1.1s var(--spring-bounce);
       pointer-events: none;
     }
     .delivery-tube.inserted {
-      top: 55px;
+      top: 68px;
     }
     .tube-vertical {
       position: absolute;
@@ -585,8 +741,8 @@
 
     .water-stream {
       position: absolute;
-      top: 0;
-      left: calc(48% - 10px);
+      top: 36px;
+      left: calc(52% - 10px);
       width: 12px;
       height: 0;
       background: linear-gradient(90deg, rgba(186,230,253,0.7), rgba(56,189,248,0.4), rgba(255,255,255,0.8));
@@ -596,11 +752,11 @@
       opacity: 0;
     }
     .water-stream.pouring {
-      height: 360px;
+      height: 335px;
       opacity: 1;
     }
 
-    /* Bubbles & Chalk Precipitate Particles */
+    /* Bubbles & Chalk Particles */
     .particle-layer {
       position: absolute;
       inset: 0;
@@ -622,11 +778,10 @@
       100% { transform: translateY(-170px) translateX(-2px) scale(1.3); opacity: 0; }
     }
 
-    /* Suspended Milky White CaCO3 Particles */
     .chalk-particle {
       position: absolute;
       border-radius: 50%;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.92);
       box-shadow: 0 0 6px #ffffff;
       animation: chalkFloat 2.8s ease-in-out infinite alternate;
     }
@@ -638,7 +793,7 @@
     .steam-cloud {
       position: absolute;
       bottom: 260px;
-      left: 35%;
+      left: 40%;
       width: 90px;
       height: 90px;
       background: radial-gradient(circle, rgba(255,255,255,0.38) 0%, transparent 70%);
@@ -655,34 +810,28 @@
       100% { transform: translateY(-140px) scale(1.9); opacity: 0; }
     }
 
-    /* ================= RIGHT PANEL: ELASTIC SIDE ANIMATIONS ================= */
+    /* ================= RIGHT PANEL: LAB INSTRUMENT CONSOLE ================= */
     .control-panel {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       perspective: 1000px;
     }
 
     .notebook-card {
-      background: linear-gradient(145deg, #151e2e, #0f1623);
-      border: 1px solid #2e3c51;
+      background: linear-gradient(145deg, #131c2e, #0c121e);
+      border: 1px solid var(--panel-border);
       border-radius: 16px;
-      padding: 22px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.55);
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       transform-origin: right center;
-      transition: transform 0.5s var(--spring-bounce), border-color 0.4s ease, box-shadow 0.4s ease;
+      transition: transform 0.5s var(--spring-bounce), border-color 0.4s ease;
     }
 
-    .notebook-card:hover {
-      border-color: #38bdf8;
-      box-shadow: 0 15px 35px rgba(14, 165, 233, 0.15);
-    }
-
-    /* Triggered via JS on every step change for elastic side entrance */
     .notebook-card.side-elastic-pop {
       animation: sideCardSpring 0.65s var(--spring-bounce);
     }
@@ -692,7 +841,7 @@
       100% { transform: translateX(0) scale(1) rotateY(0deg); opacity: 1; }
     }
 
-    /* Visual Progress Step Dots on the Side Panel */
+    /* Step Progress Dots */
     .step-progress-bar {
       display: flex;
       justify-content: space-between;
@@ -738,7 +887,6 @@
       background: #10b981;
       border-color: #6ee7b7;
       color: #052e16;
-      transform: scale(1.05);
     }
 
     .stage-indicator {
@@ -746,110 +894,132 @@
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid #263346;
-      padding-bottom: 10px;
-      margin-bottom: 12px;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
     }
     .stage-tag {
-      font-size: 0.78rem;
+      font-size: 0.75rem;
       font-weight: 700;
       color: #38bdf8;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     .reaction-type-pill {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       background: rgba(56, 189, 248, 0.15);
       color: #7dd3fc;
-      padding: 4px 12px;
+      padding: 3px 10px;
       border-radius: 14px;
       border: 1px solid rgba(56, 189, 248, 0.35);
-      transition: transform 0.5s var(--spring-wobble);
-    }
-    .reaction-type-pill.pill-bounce {
-      animation: pillElastic 0.6s var(--spring-wobble);
-    }
-    @keyframes pillElastic {
-      0% { transform: scale(0.5); }
-      70% { transform: scale(1.2); }
-      100% { transform: scale(1); }
     }
 
     .obs-title {
-      font-size: 1.22rem;
+      font-size: 1.18rem;
       color: #f8fafc;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     .obs-text {
-      font-size: 0.92rem;
-      line-height: 1.58;
+      font-size: 0.89rem;
+      line-height: 1.55;
       color: #cbd5e1;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
 
-    /* Equation Box with Elastic Pop */
-    .chem-equation-card {
+    /* Live pH Spectrum Meter Bar */
+    .ph-meter-widget {
       background: #090d16;
+      border: 1px solid #26354d;
+      border-radius: 10px;
+      padding: 9px 12px;
+      margin-bottom: 12px;
+    }
+    .ph-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .ph-bar-track {
+      height: 8px;
+      width: 100%;
+      border-radius: 6px;
+      background: linear-gradient(90deg, #ef4444 0%, #eab308 35%, #22c55e 50%, #06b6d4 70%, #6366f1 85%, #a855f7 100%);
+      position: relative;
+    }
+    .ph-pin {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid #0f172a;
+      box-shadow: 0 0 10px #fff;
+      transform: translateX(-50%);
+      transition: left 1.2s var(--spring-bounce);
+    }
+
+    /* Equation Box */
+    .chem-equation-card {
+      background: #080c14;
       border: 1px solid #334155;
       border-left: 4px solid #facc15;
-      padding: 12px 14px;
+      padding: 10px 14px;
       border-radius: 10px;
-      margin-bottom: 14px;
-      transform-origin: left center;
-      transition: transform 0.4s var(--spring-bounce);
-    }
-    .chem-equation-card:hover {
-      transform: scale(1.02) translateX(4px);
+      margin-bottom: 12px;
     }
     .chem-eq-label {
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       text-transform: uppercase;
       color: #94a3b8;
-      margin-bottom: 4px;
-      letter-spacing: 0.8px;
+      margin-bottom: 3px;
     }
     .chem-eq-formula {
       font-family: 'Courier New', monospace;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 700;
       color: #fde047;
     }
 
-    /* Staggered Elastic Property Cards on the Side */
+    /* Property Cards */
     .props-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
+      gap: 8px;
     }
     .prop-box {
-      background: #0f172a;
+      background: #090d16;
       border: 1px solid #1e293b;
-      padding: 9px 10px;
+      padding: 8px;
       border-radius: 10px;
       text-align: center;
-      transition: transform 0.4s var(--spring-wobble), border-color 0.3s ease;
+      transition: transform 0.4s var(--spring-wobble), border-color 0.3s;
     }
     .prop-box:hover {
-      transform: translateY(-5px) scale(1.05);
+      transform: translateY(-4px) scale(1.04);
       border-color: #38bdf8;
     }
     .prop-box.pop-item {
       animation: propPop 0.55s var(--spring-wobble) backwards;
     }
     @keyframes propPop {
-      0% { opacity: 0; transform: translateY(20px) scale(0.7); }
+      0% { opacity: 0; transform: translateY(18px) scale(0.75); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
     .prop-label {
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       color: #64748b;
       text-transform: uppercase;
     }
     .prop-val {
-      font-size: 0.83rem;
+      font-size: 0.8rem;
       font-weight: 700;
       color: #e2e8f0;
-      margin-top: 3px;
+      margin-top: 2px;
     }
 
     /* Interactive Elastic Buttons */
@@ -857,29 +1027,27 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      background: #141c2b;
-      padding: 16px;
+      background: #131c2e;
+      padding: 14px;
       border-radius: 16px;
-      border: 1px solid #2e3c51;
+      border: 1px solid var(--panel-border);
     }
 
     .lab-btn {
-      padding: 12px 14px;
+      padding: 11px 12px;
       border-radius: 10px;
       border: 1px solid #38bdf8;
       background: linear-gradient(180deg, #0284c7, #0369a1);
       color: #ffffff;
       font-weight: 600;
-      font-size: 0.86rem;
+      font-size: 0.84rem;
       cursor: pointer;
-      /* Elastic button hover & press transitions */
-      transition: transform 0.35s var(--spring-wobble), background 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.35s var(--spring-wobble), background 0.2s, box-shadow 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 6px;
       box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
-      position: relative;
     }
     .lab-btn:hover:not(:disabled) {
       background: linear-gradient(180deg, #0ea5e9, #0284c7);
@@ -889,7 +1057,6 @@
     .lab-btn:active:not(:disabled) {
       transform: translateY(2px) scale(0.92);
     }
-    /* Glowing Pulse on Next Available Step Button */
     .lab-btn:not(:disabled):not(.btn-reset) {
       animation: nextBtnPulse 1.8s infinite ease-in-out;
     }
@@ -899,8 +1066,8 @@
     }
 
     .lab-btn:disabled {
-      background: #1e293b;
-      border-color: #334155;
+      background: #1a2436;
+      border-color: #2e3c51;
       color: #475569;
       box-shadow: none;
       cursor: not-allowed;
@@ -911,29 +1078,58 @@
       grid-column: span 2;
       background: linear-gradient(180deg, #dc2626, #991b1b);
       border-color: #f87171;
-      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
-    }
-    .btn-reset:hover {
-      background: linear-gradient(180deg, #ef4444, #b91c1c) !important;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Header -->
-  <header class="lab-header">
-    <h1>🔬 Virtual Chemistry Lab: Quicklime (CaO) & Limewater (CO₂)</h1>
-    <span class="badge">Elastic Physics Engine</span>
-  </header>
+  <!-- Top Telemetry Navigation Bar -->
+  <nav class="lab-navbar">
+    <div class="brand-group">
+      <div class="lab-logo">⚗️</div>
+      <div class="brand-title">
+        <h1>ChemLab Pro • Virtual Fume Hood</h1>
+        <p>Exothermic Slaking of Lime & Carbonation Precipitation</p>
+      </div>
+    </div>
+
+    <div class="telemetry-group">
+      <div class="status-chip">
+        <span class="status-dot"></span>
+        <span>Fume Exhaust: <b>ACTIVE</b></span>
+      </div>
+      <button class="audio-btn" id="audioToggleBtn" onclick="toggleAudio()">
+        🔊 Sound Effects: ON
+      </button>
+    </div>
+  </nav>
 
   <main class="workspace">
-    <!-- LEFT: REALISTIC LABORATORY BENCH VIEWPORT -->
-    <section class="lab-viewport">
-      <!-- Background Shelf with Gently Swaying Bottles -->
+    <!-- LEFT: REALISTIC FUME HOOD VIEWPORT -->
+    <section class="fume-hood-frame">
+      <div class="hood-ceiling">
+        <span>Sash Height: 45 cm (Safe)</span>
+        <span>Airflow: 105 FPM</span>
+      </div>
+      <div class="hood-light-tube"></div>
+      <div class="hood-sash-ruler"></div>
+
+      <!-- Reagent Shelf -->
       <div class="lab-shelf">
-        <div class="reagent-bottle b1"></div>
-        <div class="reagent-bottle b2"></div>
-        <div class="reagent-bottle b3"></div>
+        <div class="reagent-bottle b1">CaO</div>
+        <div class="reagent-bottle b2">H₂O</div>
+        <div class="reagent-bottle b3">CO₂</div>
+      </div>
+
+      <!-- Molecular / Ion Inspector HUD -->
+      <div class="molecular-hud" id="molecularHud">
+        <div class="hud-header">
+          <span>🔬 Molecular View</span>
+          <span>250x</span>
+        </div>
+        <div class="ion-grid" id="ionGrid">
+          <span class="ion-badge">N₂ / O₂ (Air)</span>
+        </div>
       </div>
 
       <!-- Digital Temperature Readout -->
@@ -964,8 +1160,8 @@
 
       <!-- Rising Steam Plumes -->
       <div class="steam-cloud" id="steam1" style="animation-delay: 0s;"></div>
-      <div class="steam-cloud" id="steam2" style="left: 45%; animation-delay: 0.8s;"></div>
-      <div class="steam-cloud" id="steam3" style="left: 30%; animation-delay: 1.5s;"></div>
+      <div class="steam-cloud" id="steam2" style="left: 48%; animation-delay: 0.8s;"></div>
+      <div class="steam-cloud" id="steam3" style="left: 35%; animation-delay: 1.5s;"></div>
 
       <!-- 250mL Borosilicate Glass Beaker -->
       <div class="beaker-wrapper" id="beakerWrapper">
@@ -981,13 +1177,11 @@
             <div class="grad-line">50mL</div>
           </div>
 
-          <!-- Liquid Layer with Wave Meniscus -->
           <div class="liquid-container" id="liquidContainer">
             <div class="meniscus"></div>
             <div class="particle-layer" id="bubbleLayer"></div>
           </div>
 
-          <!-- Solid Calcium Oxide Lumps / Slaked Powder -->
           <div class="solid-bed" id="solidBed">
             <div class="cao-stone s1"></div>
             <div class="cao-stone s2"></div>
@@ -1003,7 +1197,7 @@
       </div>
     </section>
 
-    <!-- RIGHT: ELASTIC SCIENTIFIC NOTEBOOK & CONTROLS -->
+    <!-- RIGHT: SCIENTIFIC INSTRUMENT & OBSERVATION CONSOLE -->
     <section class="control-panel">
       <div class="notebook-card" id="notebookCard">
         <div>
@@ -1018,18 +1212,29 @@
           </div>
 
           <div class="stage-indicator">
-            <span class="stage-tag" id="stageTag">Stage 0 of 5 • Lab Setup</span>
-            <span class="reaction-type-pill" id="reactionPill">Standby</span>
+            <span class="stage-tag" id="stageTag">Stage 0 of 5 • Lab Standby</span>
+            <span class="reaction-type-pill" id="reactionPill">Ready</span>
           </div>
 
-          <h2 class="obs-title" id="obsTitle">Apparatus Ready on Lab Bench</h2>
+          <h2 class="obs-title" id="obsTitle">Apparatus Ready in Fume Hood</h2>
           <p class="obs-text" id="obsText">
-            A clean, dry 250 mL borosilicate glass beaker rests on the granite bench with a calibrated thermometer reading room temperature (<b>25.0 °C</b>).<br><br>
-            Click the glowing <b>Step 1</b> button below to drop solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker!
+            A clean 250 mL borosilicate glass beaker is positioned inside the fume hood at room temperature (<b>25.0 °C</b>).<br><br>
+            Click <b>Step 1</b> below to drop solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker and hear the glass clink!
           </p>
         </div>
 
         <div>
+          <!-- Live pH Scale Bar -->
+          <div class="ph-meter-widget">
+            <div class="ph-header">
+              <span>Live pH Spectrum Sensor</span>
+              <span id="phReadoutText">pH 7.0 (Neutral)</span>
+            </div>
+            <div class="ph-bar-track">
+              <div class="ph-pin" id="phPin" style="left: 50%;"></div>
+            </div>
+          </div>
+
           <div class="chem-equation-card">
             <div class="chem-eq-label">Balanced Chemical Equation</div>
             <div class="chem-eq-formula" id="eqFormula">Awaiting reactants...</div>
@@ -1037,7 +1242,7 @@
 
           <div class="props-grid">
             <div class="prop-box" id="pBox1" style="animation-delay: 0.05s;">
-              <div class="prop-label">Main Compound</div>
+              <div class="prop-label">Main Species</div>
               <div class="prop-val" id="propCompound">Empty Beaker</div>
             </div>
             <div class="prop-box" id="pBox2" style="animation-delay: 0.14s;">
@@ -1045,14 +1250,14 @@
               <div class="prop-val" id="propAppearance">Transparent</div>
             </div>
             <div class="prop-box" id="pBox3" style="animation-delay: 0.23s;">
-              <div class="prop-label">pH / Nature</div>
-              <div class="prop-val" id="propPH">Neutral (7.0)</div>
+              <div class="prop-label">Thermal State</div>
+              <div class="prop-val" id="propPH">Ambient (25°C)</div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Interactive Elastic Buttons -->
+      <!-- Action Buttons -->
       <div class="button-rack">
         <button class="lab-btn" id="btn1" onclick="runStep1()">1. Add Quicklime (CaO)</button>
         <button class="lab-btn" id="btn2" onclick="runStep2()" disabled>2. Pour Water (H₂O)</button>
@@ -1065,6 +1270,127 @@
   </main>
 
   <script>
+    /* ================= WEB AUDIO API SOUND ENGINE ================= */
+    let audioCtx = null;
+    let soundEnabled = true;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContext();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('audioToggleBtn');
+      if (soundEnabled) {
+        btn.innerText = "🔊 Sound Effects: ON";
+        btn.classList.remove('muted');
+        playClickPop();
+      } else {
+        btn.innerText = "🔇 Sound Effects: MUTED";
+        btn.classList.add('muted');
+      }
+    }
+
+    // Subtle UI click sound
+    function playClickPop() {
+      if (!soundEnabled) return;
+      initAudio();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(180, audioCtx.currentTime + 0.08);
+      gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.09);
+    }
+
+    // Step 1 Sound: Stones clinking against borosilicate glass
+    function playStoneClinkSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      const delays = [0.22, 0.33, 0.43, 0.51];
+      const freqs = [1150, 1380, 1020, 1490];
+      delays.forEach((d, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freqs[idx], audioCtx.currentTime + d);
+        osc.frequency.exponentialRampToValueAtTime(320, audioCtx.currentTime + d + 0.11);
+        gain.gain.setValueAtTime(0.22, audioCtx.currentTime + d);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + d + 0.12);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + d);
+        osc.stop(audioCtx.currentTime + d + 0.13);
+      });
+    }
+
+    // Step 2 Sound: Pouring water + vigorous exothermic hissing steam
+    function playExothermicHissSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      const duration = 2.6;
+      const bufferSize = audioCtx.sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(900, audioCtx.currentTime);
+      filter.frequency.exponentialRampToValueAtTime(2800, audioCtx.currentTime + 0.7);
+      filter.Q.value = 1.4;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.01, audioCtx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.28, audioCtx.currentTime + 0.5);
+      gain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + duration);
+
+      noise.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      noise.start();
+    }
+
+    // Step 4 & 5 Sound: CO2 Gas Bubbling in liquid
+    function playBubblingSound() {
+      if (!soundEnabled) return;
+      initAudio();
+      for (let i = 0; i < 14; i++) {
+        const start = audioCtx.currentTime + (i * 0.14) + (Math.random() * 0.05);
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        const baseFreq = 240 + Math.random() * 180;
+        osc.frequency.setValueAtTime(baseFreq, start);
+        osc.frequency.exponentialRampToValueAtTime(baseFreq * 2.1, start + 0.09);
+
+        gain.gain.setValueAtTime(0.12, start);
+        gain.gain.exponentialRampToValueAtTime(0.001, start + 0.1);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(start);
+        osc.stop(start + 0.11);
+      }
+    }
+
+    /* ================= DOM ELEMENTS & ANIMATION CONTROLLERS ================= */
     const beakerWrapper = document.getElementById('beakerWrapper');
     const solidBed = document.getElementById('solidBed');
     const liquidContainer = document.getElementById('liquidContainer');
@@ -1076,6 +1402,10 @@
     const mercuryCol = document.getElementById('mercuryCol');
     const digitalTemp = document.getElementById('digitalTemp');
     const digitalMeterBox = document.getElementById('digitalMeterBox');
+    const molecularHud = document.getElementById('molecularHud');
+    const ionGrid = document.getElementById('ionGrid');
+    const phPin = document.getElementById('phPin');
+    const phReadoutText = document.getElementById('phReadoutText');
 
     const notebookCard = document.getElementById('notebookCard');
     const pBox1 = document.getElementById('pBox1');
@@ -1103,24 +1433,27 @@
 
     let tempTimer = null;
 
-    // Trigger elastic side-panel animations on every step
+    function updateMolecularHUD(ionsArray, phPercent, phText) {
+      molecularHud.classList.add('hud-pop');
+      setTimeout(() => molecularHud.classList.remove('hud-pop'), 500);
+      ionGrid.innerHTML = ionsArray.map(ion => `<span class="ion-badge">${ion}</span>`).join('');
+      phPin.style.left = phPercent + '%';
+      phReadoutText.innerText = phText;
+    }
+
     function triggerSidePanelElasticity(activeStepIndex) {
-      // Restart side card spring animation
       notebookCard.classList.remove('side-elastic-pop');
-      reactionPill.classList.remove('pill-bounce');
       pBox1.classList.remove('pop-item');
       pBox2.classList.remove('pop-item');
       pBox3.classList.remove('pop-item');
 
-      void notebookCard.offsetWidth; // Force reflow
+      void notebookCard.offsetWidth;
 
       notebookCard.classList.add('side-elastic-pop');
-      reactionPill.classList.add('pill-bounce');
       pBox1.classList.add('pop-item');
       pBox2.classList.add('pop-item');
       pBox3.classList.add('pop-item');
 
-      // Update elastic progress dots
       for (let i = 0; i <= 5; i++) {
         const dot = document.getElementById('dot' + i);
         dot.classList.remove('active', 'done');
@@ -1166,7 +1499,6 @@
         bubbleLayer.appendChild(b);
       }
 
-      // Add floating white CaCO3 precipitate particles in Step 4
       if (includeChalk) {
         for (let j = 0; j < 28; j++) {
           const c = document.createElement('div');
@@ -1191,41 +1523,42 @@
 
     setSteam(false);
 
-    // STEP 1: Add Quicklime (CaO) with Elastic Stone Drop & Beaker Recoil
+    // STEP 1: Add Quicklime (CaO)
     function runStep1() {
+      playStoneClinkSound();
       solidBed.classList.add('dropped');
 
-      // Trigger elastic recoil on the glass beaker when stones hit bottom
       setTimeout(() => {
         beakerWrapper.classList.add('impact-bounce');
         setTimeout(() => beakerWrapper.classList.remove('impact-bounce'), 800);
       }, 280);
 
       triggerSidePanelElasticity(1);
+      updateMolecularHUD(['CaO (s) Lattice', 'Ca²⁺', 'O²⁻'], 50, 'Solid Basic Oxide');
 
       stageTag.innerText = "Stage 1 of 5 • Reactant Added";
-      reactionPill.innerText = "Solid Oxide";
-      obsTitle.innerText = "Calcium Oxide (Quicklime) Dropped In";
-      obsText.innerHTML = `Hard, white lumps of <b>Calcium Oxide (CaO)</b> bounce into the bottom of the beaker.<br><br>
-      • <b>Common Name:</b> Quicklime (Chuna)<br>
-      • <b>State:</b> White amorphous solid at 25.0 °C.<br>
-      Click <b>Step 2</b> to pour distilled water onto the quicklime!`;
+      reactionPill.innerText = "Quicklime (CaO)";
+      obsTitle.innerText = "Calcium Oxide Lumps Placed in Beaker";
+      obsText.innerHTML = `Hard white lumps of <b>Calcium Oxide (CaO)</b>—commonly called <i>Quicklime</i>—are placed in the beaker.<br><br>
+      • <b>Next Action:</b> Click <b>Step 2</b> to pour distilled water ($\text{H}_2\text{O}$) onto the quicklime and hear the vigorous exothermic hissing reaction!`;
       eqFormula.innerText = "CaO (s) [Quicklime — Ready to react]";
       propCompound.innerText = "CaO (Solid)";
       propAppearance.innerText = "White Lumps";
-      propPH.innerText = "Basic Oxide";
+      propPH.innerText = "25.0 °C (Ambient)";
 
       btn1.disabled = true;
       btn2.disabled = false;
     }
 
-    // STEP 2: Pour Water -> Exothermic Slaking + Thermal Vibration + Wave Slosh
+    // STEP 2: Pour Water -> Exothermic Slaking
     function runStep2() {
+      playExothermicHissSound();
       waterStream.classList.add('pouring');
       liquidContainer.style.height = '68%';
       liquidContainer.classList.add('sloshing');
 
       triggerSidePanelElasticity(2);
+      updateMolecularHUD(['Ca(OH)₂ (s)', 'Ca²⁺ (aq)', '2OH⁻ (aq)', 'H₂O'], 88, 'pH 12.4 (Strongly Alkaline)');
 
       setTimeout(() => {
         waterStream.classList.remove('pouring');
@@ -1243,14 +1576,13 @@
 
       stageTag.innerText = "Stage 2 of 5 • Slaking of Lime";
       reactionPill.innerText = "Exothermic + Combination";
-      obsTitle.innerText = "Vigorous Reaction! Slaked Lime Formed";
-      obsText.innerHTML = `<b>What happens:</b> Water reacts violently with Quicklime (CaO) with a <b>hissing sound</b>, steam, and thermal vibration!<br><br>
-      • <b>Why the beaker gets HOT:</b> This is a strongly <b>Exothermic Combination Reaction</b>—the temperature surges to <b>88.5 °C</b>.<br>
-      • <b>Product:</b> The stones crumble into fine white powder of <b>Calcium Hydroxide [Ca(OH)₂]</b> (<i>Slaked Lime</i>).`;
+      obsTitle.innerText = "Vigorous Hissing! Slaked Lime Formed";
+      obsText.innerHTML = `<b>Observation:</b> Water reacts vigorously with Quicklime ($\text{CaO}$) with a loud <b>hissing sound</b> and steam! The lumps crumble into fine white powder of <b>Calcium Hydroxide [$\text{Ca(OH)}_2$]</b>.<br><br>
+      • <b>Exothermic Nature:</b> Huge heat energy is released, spiking the temperature to <b>88.5 °C</b>!`;
       eqFormula.innerText = "CaO (s) + H₂O (l) → Ca(OH)₂ (s/aq) + Heat ↑";
       propCompound.innerText = "Ca(OH)₂ [Slaked Lime]";
       propAppearance.innerText = "Cloudy Suspension";
-      propPH.innerText = "Alkaline (pH ~12.4)";
+      propPH.innerText = "88.5 °C (HOT!)";
 
       btn2.disabled = true;
       btn3.disabled = false;
@@ -1258,6 +1590,7 @@
 
     // STEP 3: Filter into Clear Limewater
     function runStep3() {
+      playClickPop();
       beakerBody.classList.remove('exothermic');
       beakerWrapper.classList.remove('thermal-shake');
       liquidContainer.classList.remove('sloshing');
@@ -1273,28 +1606,31 @@
       animateTemperature(88.5, 27.0, 1400, false);
 
       triggerSidePanelElasticity(3);
+      updateMolecularHUD(['Ca²⁺ (aq)', '2OH⁻ (aq)', 'H₂O (l)'], 86, 'pH 12.4 (Clear Limewater)');
 
       stageTag.innerText = "Stage 3 of 5 • Filtration";
-      reactionPill.innerText = "Aqueous Solution";
+      reactionPill.innerText = "Aqueous Limewater";
       obsTitle.innerText = "Clear Limewater Obtained";
-      obsText.innerHTML = `<b>Preparing Limewater:</b> After cooling and filtering out the undissolved solid at the bottom, we obtain a crystal-clear aqueous solution of Calcium Hydroxide called <b>Limewater [Ca(OH)₂ (aq)]</b>.<br><br>
-      Click <b>Step 4</b> to bubble <b>Carbon Dioxide (CO₂)</b> gas into this clear limewater!`;
-      eqFormula.innerText = "Ca(OH)₂ (s) + H₂O (l) ⇌ Ca²⁺ (aq) + 2OH⁻ (aq) [Clear Limewater]";
+      obsText.innerHTML = `<b>How Limewater is made:</b> After cooling and filtering off the undissolved solid $\text{Ca(OH)}_2$ at the bottom, we get a transparent aqueous solution called <b>Limewater [$\text{Ca(OH)}_2\text{ (aq)}$]</b>.<br><br>
+      Click <b>Step 4</b> to bubble <b>Carbon Dioxide ($\text{CO}_2$)</b> gas through this clear limewater!`;
+      eqFormula.innerText = "Ca(OH)₂ (s) ⇌ Ca²⁺ (aq) + 2OH⁻ (aq) [Clear Limewater]";
       propCompound.innerText = "Ca(OH)₂ (aq)";
       propAppearance.innerText = "Clear & Colorless";
-      propPH.innerText = "Basic (pH ~12.4)";
+      propPH.innerText = "27.0 °C (Cooled)";
 
       btn3.disabled = true;
       btn4.disabled = false;
     }
 
-    // STEP 4: Pass CO2 -> Turns Milky White (CaCO3 Precipitate)
+    // STEP 4: Pass CO2 -> Turns Milky White
     function runStep4() {
+      playBubblingSound();
       deliveryTube.classList.add('inserted');
       liquidContainer.classList.add('sloshing');
       spawnBubbles(18, 1.1, true);
 
       triggerSidePanelElasticity(4);
+      updateMolecularHUD(['CaCO₃ (s) ↓', 'H₂O (l)', 'CO₂ (g)'], 58, 'pH ~8.3 (Precipitate)');
 
       setTimeout(() => {
         liquidContainer.classList.remove('clear-limewater');
@@ -1305,12 +1641,12 @@
       reactionPill.innerText = "Precipitation Reaction";
       obsTitle.innerText = "Limewater Turns Milky White!";
       obsText.innerHTML = `<b>Why does the water turn milky?</b><br>
-      When <b>Carbon Dioxide (CO₂)</b> gas bubbles through clear Limewater [Ca(OH)₂], they react to form <b>Calcium Carbonate (CaCO₃)</b>.<br><br>
-      • <b>Reason for Milkiness:</b> Calcium Carbonate (CaCO₃) is <b>insoluble in water</b>. Billions of tiny white solid particles (precipitate) swirl in the water, turning the liquid <b>opaque milky-white</b>!`;
-      eqFormula.innerText = "Ca(OH)₂ (aq) + CO₂ (g) → CaCO₃ (s)↓ [Milky White Ppt] + H₂O (l)";
+      Bubbling <b>Carbon Dioxide ($\text{CO}_2$)</b> gas into clear Limewater [$\text{Ca(OH)}_2$] forms <b>Calcium Carbonate ($\text{CaCO}_3$)</b>.<br><br>
+      • <b>Reason for Milkiness:</b> $\text{CaCO}_3$ is an <b>insoluble white solid precipitate</b>. Billions of tiny white chalk particles float in the water, turning it opaque milky-white!`;
+      eqFormula.innerText = "Ca(OH)₂ (aq) + CO₂ (g) → CaCO₃ (s)↓ [Milky White] + H₂O (l)";
       propCompound.innerText = "CaCO₃ (s) Precipitate";
       propAppearance.innerText = "Opaque Milky White";
-      propPH.innerText = "Near Neutral (~8.3)";
+      propPH.innerText = "Insoluble White Ppt";
 
       btn4.disabled = true;
       btn5.disabled = false;
@@ -1318,8 +1654,10 @@
 
     // STEP 5: Bonus Excess CO2 -> Milky Water Turns Clear Again
     function runStep5() {
+      playBubblingSound();
       spawnBubbles(26, 0.8, false);
       triggerSidePanelElasticity(5);
+      updateMolecularHUD(['Ca²⁺ (aq)', '2HCO₃⁻ (aq)', 'CO₂ (aq)'], 46, 'pH ~6.5 (Soluble Bicarbonate)');
 
       setTimeout(() => {
         liquidContainer.classList.remove('milky-white');
@@ -1329,19 +1667,20 @@
       stageTag.innerText = "Stage 5 of 5 • Excess CO₂ Reaction";
       reactionPill.innerText = "Dissolution Reaction";
       obsTitle.innerText = "Milkiness Disappears with Excess CO₂!";
-      obsText.innerHTML = `<b>What happens if you keep passing CO₂ for a long time?</b><br>
-      The insoluble white Calcium Carbonate (CaCO₃) reacts with excess Carbon Dioxide and water to form <b>Calcium Hydrogen Carbonate [Ca(HCO₃)₂]</b>.<br><br>
-      • <b>Why it turns clear again:</b> Because <b>Ca(HCO₃)₂ is soluble in water</b>, the white precipitate dissolves completely!`;
-      eqFormula.innerText = "CaCO₃ (s) + CO₂ (g) + H₂O (l) → Ca(HCO₃)₂ (aq) [Soluble & Clear]";
+      obsText.innerHTML = `<b>What happens when excess $\text{CO}_2$ is passed?</b><br>
+      The insoluble white $\text{CaCO}_3$ precipitate reacts further with excess $\text{CO}_2$ and water to form <b>Calcium Hydrogen Carbonate [$\text{Ca(HCO}_3)_2$]</b>.<br><br>
+      • <b>Why it turns clear again:</b> Because $\text{Ca(HCO}_3)_2$ is <b>soluble in water</b>, the white precipitate dissolves completely!`;
+      eqFormula.innerText = "CaCO₃ (s) + CO₂ (g) + H₂O (l) → Ca(HCO₃)₂ (aq) [Clear]";
       propCompound.innerText = "Ca(HCO₃)₂ (aq)";
       propAppearance.innerText = "Clear Solution";
-      propPH.innerText = "Mildly Acidic (~6.5)";
+      propPH.innerText = "Soluble in Water";
 
       btn5.disabled = true;
     }
 
     // RESET
     function resetExperiment() {
+      playClickPop();
       if (tempTimer) clearInterval(tempTimer);
       waterStream.classList.remove('pouring');
       deliveryTube.classList.remove('inserted');
@@ -1362,16 +1701,17 @@
       digitalTemp.innerText = "25.0 °C";
 
       triggerSidePanelElasticity(0);
+      updateMolecularHUD(['N₂ / O₂ (Air)'], 50, 'pH 7.0 (Neutral)');
 
-      stageTag.innerText = "Stage 0 of 5 • Lab Setup";
-      reactionPill.innerText = "Standby";
-      obsTitle.innerText = "Apparatus Ready on Lab Bench";
-      obsText.innerHTML = `A clean, dry 250 mL borosilicate glass beaker rests on the granite bench with a calibrated thermometer reading room temperature (<b>25.0 °C</b>).<br><br>
-      Click the glowing <b>Step 1</b> button below to drop solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker!`;
+      stageTag.innerText = "Stage 0 of 5 • Lab Standby";
+      reactionPill.innerText = "Ready";
+      obsTitle.innerText = "Apparatus Ready in Fume Hood";
+      obsText.innerHTML = `A clean 250 mL borosilicate glass beaker is positioned inside the fume hood at room temperature (<b>25.0 °C</b>).<br><br>
+      Click <b>Step 1</b> below to drop solid lumps of <b>Calcium Oxide (Quicklime)</b> into the beaker and hear the glass clink!`;
       eqFormula.innerText = "Awaiting reactants...";
       propCompound.innerText = "Empty Beaker";
       propAppearance.innerText = "Transparent";
-      propPH.innerText = "Neutral (7.0)";
+      propPH.innerText = "Ambient (25°C)";
 
       btn1.disabled = false;
       btn2.disabled = true;
